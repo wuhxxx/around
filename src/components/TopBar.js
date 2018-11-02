@@ -1,15 +1,22 @@
 import React, { Component } from "react";
 import logo from "../assets/images/logo.svg";
+import { Icon } from "antd";
 
 class TopBar extends Component {
     render() {
         return (
-            <div className="App">
-                <header className="App-header">
+            <header className="App-header">
+                <div>
                     <img src={logo} className="App-logo" alt="logo" />
                     <div className="App-title">Around</div>
-                </header>
-            </div>
+                </div>
+
+                {this.props.isLoggedIn ? (
+                    <a className="logout" onClick={this.props.handleLogout}>
+                        <Icon type="logout" theme="outlined" /> Logout
+                    </a>
+                ) : null}
+            </header>
         );
     }
 }

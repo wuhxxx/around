@@ -1,5 +1,7 @@
-import { Form, Icon, Input, Button, Checkbox } from "antd";
+import { Form, Icon, Input, Button, message } from "antd";
 import React from "react";
+import { Link } from "react-router-dom";
+import { API_ROOT, TOKEN_KEY } from "../constant.js";
 
 const FormItem = Form.Item;
 
@@ -9,6 +11,30 @@ class NormalLoginForm extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 console.log("Received values of form: ", values);
+                fetch(`${API_ROOT}/login`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        username: values.username,
+                        password: values.password
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text();
+                        }
+                        throw new Error(response.statusText);
+                    })
+                    .then(data => {
+                        console.log(data);
+                        this.props.handleLogin(data);
+                        localStorage.setItem(TOKEN_KEY, data);
+                        message.success("Login succeeds");
+                        // this.props.history.push("/home"); /
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        message.error("Login fails");
+                    });
             }
         });
     };
@@ -18,7 +44,7 @@ class NormalLoginForm extends React.Component {
         return (
             <Form onSubmit={this.handleSubmit} className="login-form">
                 <FormItem>
-                    {getFieldDecorator("userName", {
+                    {getFieldDecorator("username", {
                         rules: [
                             {
                                 required: true,
@@ -59,13 +85,6 @@ class NormalLoginForm extends React.Component {
                     )}
                 </FormItem>
                 <FormItem>
-                    {getFieldDecorator("remember", {
-                        valuePropName: "checked",
-                        initialValue: true
-                    })(<Checkbox>Remember me</Checkbox>)}
-                    <a className="login-form-forgot" href="">
-                        Forgot password
-                    </a>
                     <Button
                         type="primary"
                         htmlType="submit"
@@ -73,11 +92,11 @@ class NormalLoginForm extends React.Component {
                     >
                         Log in
                     </Button>
-                    Or <a href="">register now!</a>
+                    Or <Link to="/register">register now!</Link>
                 </FormItem>
             </Form>
         );
     }
 }
 
-export const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
+export const Login = Form.create()(NormalLoginForm);

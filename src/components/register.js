@@ -1,5 +1,6 @@
 import { Form, Input, Button, message } from "antd";
 import React from "react";
+import { Link } from "react-router-dom";
 import { API_ROOT } from "../constant.js";
 
 const FormItem = Form.Item;
@@ -28,6 +29,8 @@ class RegistrationForm extends React.Component {
                     .then(response => response.text())
                     .then(() => {
                         message.success("Registration Succeed");
+                        // jump to other page after success
+                        this.props.history.push("/login");
                     })
                     .catch(err => {
                         message.success("Registration Failed");
@@ -87,8 +90,8 @@ class RegistrationForm extends React.Component {
 
         return (
             <Form onSubmit={this.handleSubmit} className="register">
-                <FormItem {...formItemLayout} label={"Username"}>
-                    {getFieldDecorator("nickname", {
+                <FormItem {...formItemLayout} label={"username"}>
+                    {getFieldDecorator("username", {
                         rules: [
                             {
                                 required: true,
@@ -133,6 +136,10 @@ class RegistrationForm extends React.Component {
                     <Button type="primary" htmlType="submit">
                         Register
                     </Button>
+                    <p>
+                        I already have an account, go back to{" "}
+                        <Link to="/login">login</Link>
+                    </p>
                 </FormItem>
             </Form>
         );
