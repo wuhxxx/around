@@ -1,13 +1,23 @@
 import React, { Component } from "react";
 import { Tabs, Button, Spin } from "antd";
-import { GEO_OPTIONS } from "../constant.js";
+import { Gallery } from "./Gallery.js";
+import { CreatePostButton } from "./CreatePostButton.js";
+import {
+    GEO_OPTIONS,
+    POS_KEY,
+    API_ROOT,
+    AUTH_HEADER,
+    TOKEN_KEY
+} from "../constant.js";
 
 const TabPane = Tabs.TabPane;
 
 export class Home extends Component {
     state = {
         isLoadingGeoLocation: false,
-        error: ""
+        error: "",
+        isLoadingPosts: false,
+        posts: []
     };
 
     componentDidMount() {
@@ -25,7 +35,13 @@ export class Home extends Component {
 
     onSuccessLoadGeoLocation = position => {
         console.log(position);
+        const { latitude, longitude } = position.coords;
+        localStorage.setItem(
+            POS_KEY,
+            JSON.stringify({ lat: latitude, lon: longitude })
+        );
         this.setState({ isLoadingGeoLocation: false });
+        this.loadNearbyPost();
     };
 
     onFailedLoadGeoLocation = () => {
@@ -35,16 +51,63 @@ export class Home extends Component {
         });
     };
 
+    loadNearbyPost = () => {
+        const { lat, lon } = JSON.parse(localStorage.getItem(POS_KEY));
+        const jwtToken = localStorage.getItem(TOKEN_KEY);
+        this.setState({ isLoadingPosts: true, error: "" });
+        return fetch(`${API_ROOT}/search?lat=${lat}&lon=${lon}&range=20000`, {
+            method: "GET",
+            headers: {
+                Authorization: `${AUTH_HEADER} ${jwtToken}`
+            }
+        })
+            .then(response => {
+                if (response.ok) return response.json();
+                throw new Error("Failed to load posts");
+            })
+            .then(data => {
+                console.log(data);
+                this.setState({
+                    isLoadingPosts: false,
+                    posts: data ? data : []
+                });
+            })
+            .catch(err => {
+                console.log(err.message);
+                this.setState({ isLoadingPosts: false, error: err.message });
+            });
+    };
+
     getImagePosts = () => {
-        const { error, isLoadingGeoLocation } = this.state;
+        const {
+            error,
+            isLoadingGeoLocation,
+            isLoadingPosts,
+            posts
+        } = this.state;
         if (error) return error;
         else if (isLoadingGeoLocation)
             return <Spin tip="Loading geo location..." />;
-        else return "content of tab 1";
+        else if (isLoadingPosts) return <Spin tip="Loading posts..." />;
+        else if (posts.length > 0) {
+            const images = this.state.posts.map(post => {
+                return {
+                    user: post.user,
+                    src: post.url,
+                    thumbnail: post.url,
+                    caption: post.message,
+                    thumbnailWidth: 400,
+                    thumbnailHeight: 300
+                };
+            });
+            return <Gallery images={images} />;
+        } else return "No nearby posts";
     };
 
     render() {
-        const operations = <Button type="primary">Create New Post</Button>;
+        const operations = (
+            <CreatePostButton loadNearbyPosts={this.loadNearbyPosts} />
+        );
         return (
             <Tabs tabBarExtraContent={operations} className="main-tabs">
                 <TabPane tab="Image Posts" key="1">

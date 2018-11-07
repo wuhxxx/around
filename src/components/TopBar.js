@@ -6,7 +6,7 @@ class TopBar extends Component {
     render() {
         return (
             <header className="App-header">
-                <div>
+                <div className="App-header-left">
                     <img src={logo} className="App-logo" alt="logo" />
                     <div className="App-title">Around</div>
                 </div>

@@ -16,6 +16,11 @@
     height: 50px;
 }
 
+.App-header-left {
+    display: flex;
+    align-items: center;
+}
+
 .App-link {
     color: #61dafb;
 }
