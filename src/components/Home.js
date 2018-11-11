@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Tabs, Button, Spin } from "antd";
 import { Gallery } from "./Gallery.js";
 import { CreatePostButton } from "./CreatePostButton.js";
+import { AroundMap } from "./AroundMap.js";
 import {
     GEO_OPTIONS,
     POS_KEY,
@@ -41,7 +42,7 @@ export class Home extends Component {
             JSON.stringify({ lat: latitude, lon: longitude })
         );
         this.setState({ isLoadingGeoLocation: false });
-        this.loadNearbyPost();
+        this.loadNearbyPosts();
     };
 
     onFailedLoadGeoLocation = () => {
@@ -51,7 +52,7 @@ export class Home extends Component {
         });
     };
 
-    loadNearbyPost = () => {
+    loadNearbyPosts = () => {
         const { lat, lon } = JSON.parse(localStorage.getItem(POS_KEY));
         const jwtToken = localStorage.getItem(TOKEN_KEY);
         this.setState({ isLoadingPosts: true, error: "" });
@@ -117,7 +118,12 @@ export class Home extends Component {
                     Content of tab 2
                 </TabPane>
                 <TabPane tab="Map" key="3">
-                    Content of tab 3
+                    <AroundMap
+                        googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3CEh9DXuyjozqptVB5LA-dN7MxWWkr9s&v=3.exp&libraries=geometry,drawing,places"
+                        loadingElement={<div style={{ height: `100%` }} />}
+                        containerElement={<div style={{ height: `800px` }} />}
+                        mapElement={<div style={{ height: `100%` }} />}
+                    />
                 </TabPane>
             </Tabs>
         );
