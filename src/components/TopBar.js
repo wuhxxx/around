@@ -12,7 +12,11 @@ class TopBar extends Component {
                 </div>
 
                 {this.props.isLoggedIn ? (
-                    <a className="logout" onClick={this.props.handleLogout}>
+                    <a
+                        className="logout"
+                        href="#0"
+                        onClick={this.props.handleLogout}
+                    >
                         <Icon type="logout" theme="outlined" /> Logout
                     </a>
                 ) : null}

@@ -13,7 +13,8 @@ class App extends Component {
         this.setState({ isLoggedIn: true });
     };
 
-    handleLogout = () => {
+    handleLogout = event => {
+        event.preventDefault();
         localStorage.removeItem(TOKEN_KEY);
         this.setState({ isLoggedIn: false });
     };
